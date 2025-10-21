@@ -6,14 +6,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export function setupStaticServing(app: express.Express) {
-  const staticPath = path.join(__dirname, '../public');
-  console.log('Serving static files from:', staticPath);
+  // Ruta correcta del build de Vite
+  const staticPath = path.join(__dirname, '../dist/public');
+  console.log('✅ Serving static files from:', staticPath);
 
-  // Servir archivos estáticos
+  // Servir todos los archivos estáticos del frontend
   app.use(express.static(staticPath));
 
-  // Redirigir cualquier otra ruta al index.html
-  app.use((_req, res) => {
+  // Redirigir cualquier otra ruta al index.html (para SPA)
+  app.get('/*', (_req, res) => {
     res.sendFile(path.join(staticPath, 'index.html'));
   });
 }
