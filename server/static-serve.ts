@@ -1,20 +1,21 @@
-import path from 'path';
 import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-/**
- * Sets up static file serving for the Express app
- * @param app Express application instance
- */
-export function setupStaticServing(app: express.Application) {
-  // Serve static files from the public directory
-  app.use(express.static(path.join(process.cwd(), 'public')));
+// Obtener __dirname porque estamos usando módulos ES
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-  // For any other routes, serve the index.html file
-  app.get('/{*splat}', (req, res, next) => {
-    // Skip API routes
-    if (req.path.startsWith('/api/')) {
-      return next();
-    }
-    res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
+export function setupStaticServing(app: express.Express) {
+  // En producción, el HTML y assets quedan en dist/public
+  const staticPath = path.join(__dirname, '../public');
+  console.log('Serving static files from:', staticPath);
+
+  app.use(express.static(staticPath));
+
+  // Redirige todas las rutas al index.html (para apps React/Vite)
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(staticPath, 'index.html'));
   });
 }
+
